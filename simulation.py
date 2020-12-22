@@ -43,8 +43,10 @@ def reproduce(fertilityx, fertilityy):
         if person.gender == 1:
             if person.age > fertilityx:
                 if person.age < fertilityy:
-                    if random.randint(0,5) == 1:
-                        peopleDictionary.append(Person(0))
+                    if random.randint(0,5)==1:
+                        if random.randint(0,100)>infantMortality:
+                            peopleDictionary.append(Person(0))
+
 #here it is assumed that 1 in 5 women will become pregnant every year. if any person is female b/n 18 and 35, they have 20% chance to give birth, adding new person of age 0 to population
 
 #could be generally done with math but laying out code as object-based script allows for more flexibility, visualization
@@ -53,7 +55,8 @@ def beginSim():
     for x in range(startingPopulation):
         peopleDictionary.append(Person(random.randint(18,50)))
 
-def runYear(food, agriculture, fertilityx, fertilityy, popList):
+
+def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disasterChance, popList):
     harvest(food, agriculture)
     reproduce(fertilityx, fertilityy)
     for person in peopleDictionary:
@@ -69,10 +72,16 @@ def runYear(food, agriculture, fertilityx, fertilityy, popList):
     print('Current Population: ', len(peopleDictionary))
     popList.append(len(peopleDictionary))
     
+    if random.randint(0,100) < disasterChance:
+        del peopleDictionary[0:int(random.uniform(0.05, 0.2)*len(peopleDictionary))]
+    print(len(peopleDictionary))
+    infantMortality *= 0.985
+    return infantMortality
+    
 popList = []
 beginSim()
 while len(peopleDictionary)<100000 and len(peopleDictionary) > 1:
-    runYear(food, agriculture, fertilityx, fertilityy, popList)
+    infantMortality = runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disasterChance, popList)
 
 plt.plot(popList)
 plt.show()
